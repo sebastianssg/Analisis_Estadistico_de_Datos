@@ -13,10 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r cars}
-datos = read.csv(file = "C:/Users/juluk/OneDrive - Universidad del rosario/Escritorio/Universidad 2021-2/AED/Proyecto final/v2/baseDeDatosFinal.csv", sep=",")
+datos = read.csv(file = "baseDeDatosFinal.csv", sep=",")
 
 ```
-
 
 Vamos a realizar una regresion lineal, donde utilizaremos como variables predictoras: 
 
