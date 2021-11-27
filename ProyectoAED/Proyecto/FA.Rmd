@@ -1,0 +1,63 @@
+---
+title: "FA"
+author: "Juan Lucas García Osorio, Daniel Jose Forero y Sebastián Suárez García"
+date: "25/11/2021"
+output: html_document
+---
+
+Se carga el dataset.
+```{r}
+datos = read.csv('test.csv',sep = ",")
+datos = datos[4:49]
+head(datos)
+
+```
+
+Usando factanal con cinco factores no rotados.
+
+```{r}
+library(MASS)
+# usar 5 o 8 factores
+fa_1 <- factanal(datos,factors = 5,rotation = "none",lower = 0.1)
+fa_1
+```
+
+Unicidades
+```{r}
+fa_1$uniquenesses
+```
+Comunalidad
+```{r}
+apply(fa_1$loadings^2,1,sum) # communality
+```
+Matriz residual
+```{r}
+Lambda = fa_1$loadings
+Psi = diag(fa_1$uniquenesses)
+S = fa_1$correlation
+Sigma = Lambda %*% t(Lambda) + Psi
+#Ahora restamos la matriz de correlación ajustada (Sigma) de nuestra matriz de correlación observada (S). También redondeamos el resultado a 4 dígitos.
+
+round(S - Sigma, 4)
+
+```
+
+
+Gráficas factores no rotados.
+```{r}
+load <- fa_1$loadings[,1:5]
+plot(load,type="n") 
+text(load,labels=names(datos),cex=.8)
+```
+Con una rotacion varimax
+```{r}
+fa_2 <- factanal(datos,5,rotation = "varimax",lower = 0.1)
+fa_2
+```
+Gráfica factores rotados.
+```{r}
+load <- fa_2$loadings[,1:5]
+plot(load,type="n") 
+text(load,labels=names(datos),cex=0.8)
+```
+

@@ -1,0 +1,71 @@
+---
+title: "kmeans"
+author: "Juan Lucas García Osorio, Daniel Jose Forero y Sebastián Suárez García"
+date: "11/24/2021"
+output: html_document
+---
+
+Se carga el dataset.
+```{r}
+#datos = read.csv('baseDeDatosFinal.csv',sep = ",")
+datos = read.csv('test2.csv',sep = ",")
+datos = datos[4:52]
+#head(datos)
+
+```
+
+
+```{r}
+set.seed(1234)
+wcss <- vector()
+for(i in 1:20){
+  wcss[i] <- sum(kmeans(datos, i)$withinss)
+}
+# Within Clusters Summed Squares
+```
+
+Metodo del codo
+```{r}
+ggplot() + geom_point(aes(x = 1:20, y = wcss), color = 'blue') + 
+  geom_line(aes(x = 1:20, y = wcss), color = 'blue') + 
+  ggtitle("Método del Codo") + 
+  xlab('Cantidad de Centroides k') + 
+  ylab('WCSS')
+```
+## viendo el metodo del codo se eligio k = 7
+
+
+k-means, para las 5 primeras componentes principales con $K=7$
+```{r}
+km.out = kmeans(datos[,1:5], 7, nstart =1)
+plot( datos[,1:5], col =(km.out$cluster +1) , main =" K-Means Clustering Results with K=7" , pch =20 , cex =1)
+
+km.out$tot.withinss #cluster sum of square (wss)
+```
+
+k-means, para las 2 primeras componentes principales con $K=7$
+```{r}
+km.out = kmeans(pca_x[,1:2], 7, nstart =1)
+plot( pca_x[,1:2], col =( km.out$cluster +1) , main =" K-Means Clustering Results with K=7" , pch =20 , cex =1)
+
+km.out$tot.withinss #cluster sum of square (wss)
+```
+
+
+```{r}
+km.clusters=km.out$cluster
+table(km.clusters,datos2[,50])
+```
+
+
+```{r}
+
+```
+se puede agrupar en mas de 2 grupos, pero el k adecuado es 2. elbow
+
+Comparacion
+```{r}
+table(km.clusters,hc.clusters)
+```
+
+

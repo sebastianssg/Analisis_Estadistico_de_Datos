@@ -1,0 +1,49 @@
+---
+title: "PCA"
+author: "Juan Lucas García Osorio, Daniel Jose Forero y Sebastián Suárez García"
+date: "25/11/2021"
+output: html_document
+---
+
+Se carga el dataset.
+```{r}
+datos = read.csv('baseDeDatosFinal.csv',sep = ",")
+datos2 = read.csv('baseDeDatosFinal.csv',sep = ",")
+datos = datos[5:51]
+head(datos)
+```
+
+Realizamos PCA con prcomp y cargamos ggplot2.
+```{r}
+library(ggplot2)
+datos.pca2 = prcomp(datos, scale=TRUE)
+pca_x = data.frame(datos.pca2$x)
+#datos.pca2
+summary(datos.pca2)
+
+```
+Gráfica de las componentes principales.
+```{r}
+library(ggfortify)
+autoplot(datos.pca2, data = datos2, colour = 'VaCatEf')
+```
+
+```{r}
+biplot(x = datos.pca2, scale = 0, cex = 0.5, col = c("blue", "red"))
+```
+
+Gráfica proporción de la varianza.
+```{r}
+library(factoextra)
+pca_pve = 1*datos.pca2$sdev^2/sum(datos.pca2$sdev^2) # prop de varianza
+#pca_pve_df = data.frame(Component=c(1:46), PVE=pca_pve)
+#ggplot(pca_pve_df, aes(x=Component, y=PVE)) + geom_point() + geom_line()
+#ggplot(data=data.frame(pca_pve, pc = 1:46), aes(x = pc, y=pca_pve)) + geom_col(width = 0.3) + scale_y_continuous(limits = c(0,1)) + theme_bw()+labs(x = "Componente Principal", y = "Prop. de varianza explicada")
+
+fviz_screeplot(datos.pca2, addlabels = TRUE, ylim = c(0,45),ncp = 15)
+```
+
+
+Las primaras 10 componentes resumen el 82.1%
+Las primaras 15 componentes resumen el 90.1%
+

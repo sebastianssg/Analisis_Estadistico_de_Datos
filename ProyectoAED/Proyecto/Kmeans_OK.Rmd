@@ -1,0 +1,105 @@
+---
+title: "Kmeans_OK"
+author: "Juan Lucas García Osorio, Daniel Jose Forero y Sebastián Suárez García"
+date: "11/24/2021"
+output: html_document
+---
+Se carga el dataset.
+```{r}
+#datos = read.csv('baseDeDatosFinal.csv',sep = ",")
+datos = read.csv('baseDeDatosFinal.csv',sep = ",")
+datos = datos[5:51]
+head(datos)
+
+```
+
+Se normalizan los datos
+```{r}
+df <- datos
+df
+
+df <- scale(df)
+head(df)
+
+```
+
+Se calcula la matriz de distancias
+
+```{r}
+library(tidyr)
+library(tidyverse)
+library(cluster)
+library(NbClust)
+library(factoextra)
+
+
+m.distancia <- get_dist(df, method = "euclidean") 
+fviz_dist(m.distancia, gradient = list(low = "blue", mid = "white", high = "red"))
+```
+Número de clústers
+```{r}
+
+fviz_nbclust(df, kmeans, method = "wss") # codo
+fviz_nbclust(df, kmeans, method = "silhouette") # silueta
+
+```
+Se calculan los dos clústers
+
+```{r}
+
+k2 <- kmeans(df, centers = 2, nstart = 25)
+k2
+str(k2)
+
+```
+Se grafica
+```{r}
+fviz_cluster(k2, data = df)
+#fviz_cluster(k2, data = df, ellipse.type = "norm",repel = TRUE,star.plot = TRUE) #ellipse.type= "t", "norm", "euclid"
+#fviz_cluster(k2, data = df, ellipse.type = "norm")
+
+```
+
+```{r}
+res2 <- hcut(df, k = 2, stand = TRUE)
+fviz_dend(res2, rect = TRUE, cex = 0.5,
+          k_colors = c("red","#2E9FDF"))
+
+#res4 <- hcut(df, k = 4, stand = TRUE)
+#fviz_dend(res4, rect = TRUE, cex = 0.5, k_colors = c("red","#2E9FDF","green","black"))
+
+```
+
+
+```{r}
+
+
+#pasar los cluster a mi df inicial para trabajar con ellos
+
+datos1 = read.csv('baseDeDatosFinal.csv',sep = ",")
+datos1 %>%
+  mutate(Cluster = k2$cluster) %>%
+  group_by(Cluster) %>%
+  summarise_all("mean")
+
+df1 <- datos1
+df1
+df1$clus<-as.factor(k2$cluster)
+df1
+
+df1 <- datos
+df1 <- scale(df1)
+df1 <- as.data.frame(df1)
+df1$clus<-as.factor(k2$cluster)
+df1
+
+df1$clus<-factor(df1$clus)
+data_long <- gather(df1, caracteristica, valor, GP:ET, factor_key=TRUE)
+data_long
+
+ggplot(data_long, aes(as.factor(x = caracteristica), y = valor,group=clus, colour = clus)) + 
+  stat_summary(fun = mean, geom="pointrange", size = 1)+
+  stat_summary(geom="line")
+  geom_point(aes(shape=clus))
+
+```
