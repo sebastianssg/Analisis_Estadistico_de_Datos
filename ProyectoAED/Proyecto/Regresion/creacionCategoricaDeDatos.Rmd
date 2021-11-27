@@ -1,5 +1,5 @@
 ---
-title: "Prueba de hipotesis"
+title: "Categorizacion"
 author: "Juan Lucas García Osorio, Daniel Jose Forero y Sebastián Suárez García"
 date: "24/11/2021"
 output: html_document
