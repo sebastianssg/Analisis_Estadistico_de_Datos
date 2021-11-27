@@ -1,0 +1,115 @@
+---
+title: "Regresion lineal"
+author: "Juan Lucas García Osorio, Daniel Jose Forero y Sebastián Suárez García"
+date: "23/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Regresion lineal
+
+
+```{r cars}
+datos = read.csv(file = "C:/Users/juluk/OneDrive - Universidad del rosario/Escritorio/Universidad 2021-2/AED/Proyecto final/v2/baseDeDatosFinal.csv", sep=",")
+
+```
+
+
+Vamos a realizar una regresion lineal, donde utilizaremos como variables predictoras: 
+
+$z_1$: Equipo
+
+$z_2$: Partidos jugados
+
+$z_3$: Porcentaje de minutos jugados
+
+$z_4$: Calificacion ofensiva
+
+la variable respuesta Y sera:
+
+$Y1$: cestas realizadas de 2 puntos
+$Y2$: cestas realizadas de 3 puntos
+$Y3$: objetivo efectivo en el campo
+
+
+
+Como $z_1$ es una variable no numerica codificamos los valores de los equipos en numeros, esto lo podemos hacer asignando un numero a cada grupo.
+
+
+```{r }
+library(Dict)
+
+teamNumerico <- data.frame(nrow = nrow(datos))
+
+teamNumerico <- as.data.frame(teamNumerico)
+
+diccionario <- c()
+
+
+
+llave = 1
+for(dato in datos$team){
+
+  diccionario[dato] = llave
+  llave = llave + 1
+
+}
+
+indice  = 1
+for(dato in datos$team){
+  teamNumerico[indice,1] = as.numeric(diccionario[dato])
+  indice = indice + 1
+}
+
+indice2 = 1
+datos$teamNumerico2 <- c()
+for(datico in t(teamNumerico)){
+  datos$teamNumerico2[indice2] = datico
+  indice2 = indice2 + 1
+}
+
+
+
+```
+
+```{r }
+datosParaRegresion = cbind(datos$TPM, datos$teamNumerico2, datos$GP, datos$Min_per,datos$Ortg)
+pairs(datosParaRegresion, labels=c("Tiros de 2", "Equipo", "Juegos jugados", "Minutos jugados", "Puntaje ofensivo"))
+```
+Matriz de diagramas de dispersion, en el cual podemos ver el tipo de relacion que existe entre nuestra variable respuesta y las variables predictoras, de modo que, vemos una relacion lineal entre las variables (tiros de a 2, minutos jugados).
+
+```{r }
+cor(datosParaRegresion)
+```
+calculamos la matriz de coeficientes de correlación, para cuantificar el grado de relación lineal, de aca confirmamos que la relacion mas fuerte entre variables respuesta y predictorias esta entre (tiros de a 2, minutos jugados).  
+
+```{r }
+regresion = lm(datos$TPM ~ datos$teamNumerico2 + datos$GP + datos$Min_per, data=datos)
+summary(regresion)
+```
+De aca podemos ver que los $\beta$ estan dados por la columna Estimates. Por lo tanto, la ecuacion de la recta para minimos cuadrados entre las variables (tiros de a 2, minutos jugados) esta dada por la ecuacion: 
+
+$$y =   1.8759596 + 0.5632940x$$
+
+```{r }
+plot(datos$Min_per, datos$TPM, xlab='Minutos jugados', ylab='Puntos de 2')
+abline(regresion, col="red")
+```
+Como se puede ver, la recta se ubica donde estan mas concentrados los datos.
+
+
+# Conclusiones del modelo
+
+Los errores tipicos de los estimadores de los parametros $\beta_0$, $\beta_1$, $\beta_2$, $\beta_3$, $\beta_4$, para nuestros datos los valores son: 2.6001189, 0.0005855, 0.0388989, 0.0136542 y 0.0090361 respectivamente. 
+
+
+Ahora, analizaremos los intervalos de confianza para los parametros, esto con un nivel de significancia del  0.95
+
+```{r }
+confint(regresion)
+```
+
+

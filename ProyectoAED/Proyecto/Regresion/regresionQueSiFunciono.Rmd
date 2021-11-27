@@ -1,0 +1,122 @@
+---
+title: "Regresion lineal"
+author: "Juan Lucas García Osorio, Daniel Jose Forero y Sebastián Suárez García"
+date: "23/11/2021"
+output: html_document
+---
+
+
+## Regresion lineal
+
+
+```{r cars}
+datos = read.csv(file = "baseDeDatosFinal.csv", sep=",")
+
+```
+
+
+Vamos a realizar una regresion lineal, donde utilizaremos como variables predictoras: 
+
+$z_1$: Equipo
+
+$z_2$: Partidos jugados
+
+$z_3$: Porcentaje de minutos jugados
+
+$z_4$: Calificacion ofensiva
+
+la variable respuesta Y sera:
+
+$Y1$: cestas realizadas de 2 puntos
+$Y2$: cestas realizadas de 3 puntos
+$Y3$: objetivo efectivo en el campo
+
+
+
+Como $z_1$ es una variable no numerica codificamos los valores de los equipos en numeros, esto lo podemos hacer asignando un numero a cada grupo.
+
+
+```{r }
+library(Dict)
+
+teamNumerico <- data.frame(nrow = nrow(datos))
+
+teamNumerico <- as.data.frame(teamNumerico)
+
+diccionario <- c()
+
+
+
+llave = 1
+for(dato in datos$team){
+
+  diccionario[dato] = llave
+  llave = llave + 1
+
+}
+
+indice  = 1
+for(dato in datos$team){
+  teamNumerico[indice,1] = as.numeric(diccionario[dato])
+  indice = indice + 1
+}
+
+indice2 = 1
+datos$teamNumerico2 <- c()
+for(datico in t(teamNumerico)){
+  datos$teamNumerico2[indice2] = datico
+  indice2 = indice2 + 1
+}
+
+
+
+```
+
+```{r }
+
+datosSinCero = datos
+
+datosParaRegresion = cbind(datosSinCero$Ortg, datosSinCero$ET)
+
+pairs(datosParaRegresion, labels=c("Puntaje ofensivo", "Efectividad de tiros"))
+```
+Matriz de diagramas de dispersion, en el cual podemos ver el tipo de relacion que existe entre nuestra variable respuesta y las variables predictoras, de modo que, vemos una relacion lineal entre las variables (tiros de a 2, minutos jugados).
+
+```{r }
+cor(datosParaRegresion)
+```
+calculamos la matriz de coeficientes de correlación, para cuantificar el grado de relación lineal, de aca confirmamos que la relacion mas fuerte entre variables respuesta y predictorias esta entre (tiros de a 2, minutos jugados).  
+
+```{r }
+x <- datosSinCero$ET
+y <- datosSinCero$Ortg
+
+regresion = lm(x ~ y, data=datosSinCero)
+summary(regresion)
+```
+De aca podemos ver que los $\beta$ estan dados por la columna Estimates. Por lo tanto, la ecuacion de la recta para minimos cuadrados entre las variables (tiros de a 2, minutos jugados) esta dada por la ecuacion: 
+
+$$y =   1.749*10^{-2} + 2.895*10^{-3}x$$
+
+```{r }
+plot(datosSinCero$Ortg, datosSinCero$ET, xlab='puntaje ofensivo', ylab='efectividad de tiro')
+abline(regresion, col="red") 
+```
+Como se puede ver, la recta se ubica donde estan mas concentrados los datos.
+
+
+
+# Calculo de predicciones
+
+Segun la pagina de la NBA el puntaje ofensivo de Lebron James es 113.9
+```{r }
+predict(regresion, newdata = data.frame(y = 113.9), interval = "confidence")
+
+```
+Nuestro modelo predijo que la eficiencia de tiro (ET) para Lebron James estara entre el intervalo ( 0.3577547, 0.3662802) con una confianza del 95%, ahora, nuevamente segun la pagina de la NBA el average accuracy para Lebro es de 34.5%.
+
+Por lo que, concluimos que nuestro modelo puede entregar predicciones relatiavamente acertada.
+
+
+
+

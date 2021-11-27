@@ -1,0 +1,88 @@
+---
+title: "Prueba de hipotesis"
+author: "Juan Lucas García Osorio, Daniel Jose Forero y Sebastián Suárez García"
+date: "24/11/2021"
+output: html_document
+---
+
+
+Debido a que nuestro dataset no tiene variables categoricas no fue posible realizar clustering, LDA, QDA, entre otros. De modo que, vamos a categorizar los jugadores como buen anotador, anotador medio, anotador bajo, esto lo haremos con las siguientes variables: 
+
+TPM --> Canastas de 3 puntos realizadas
+twoPM ---> Canastas de 2 puntos realizadas
+
+TPA --> Canastas de 3 puntos intentados
+twoPA --> Canastas de 2 puntos intentados
+
+
+crearemos dos variables nuevas en funcion de las mencionadas anteriormente, 
+
+ETPR --> tasa efectiva de canastas de 3 puntos
+donde estara dada por: 
+
+ETPR = TPM/TPA
+
+ETwoPR --> tasa efectiva de canastas de 2 puntos
+donde estara dada por: 
+
+ETwoPR = twoPM/twoPA
+
+Notese que ETPR y ETwoPR son variables la cuales toman valores entre 0 y 1, por otro lado, combinaremos estas dos variables para crear una sola, debido a que, las canastas de 3 puntos son mas valiosas y complicadas que las de 3 puntos, de modo que, debemos otorgarle un peso a cada una.
+
+ET --> Eficacia total del jugador
+donde estara dada por: 
+
+ET = (3*ETPR + 2*ETwoPR)/6
+
+Se divide el resultado en 6 dado que, este es el mayor valor que puede tomar, entonces, estamos normalizando el resultando, entregando asi, un "porcentaje" de que tan efectivo es el jugador
+
+Ahora, categorizaremos a los jugadores como en funcion del ET mayor y menor de nuestros datos.
+
+donde tenemos que el mayor ET es 0.8333333, y el menor ET es 0, por lo que, la clasificacion estara dada de la siguiente manera:
+
+"buen anotador" si 0.5555533 < ET $\leq$ 0.8333333
+"anotador medio" si 0.27777767 < ET $\leq$ 0.5555533
+"anotador bajo" si 0 < ET $\leq$ 0.27777767
+
+```{r cars}
+datos = read.csv(file = "C:/Users/juluk/OneDrive - Universidad del rosario/Escritorio/Universidad 2021-2/AED/Proyecto final/v2/CollegeBasketballPlayers2009-2021v2.csv", sep=",")
+
+```
+
+
+```{r cars}
+ETPR = datos$TPM/datos$TPA
+ETwoPR = datos$twoPM/datos$twoPA
+
+ET = (3*ETPR + 2*ETwoPR)/6
+
+ET[is.nan(ET)] = 0
+
+datos$ET = ET
+
+puntajeAnotacionMaximo = max(datos$ET)/3
+
+categorico = c()
+
+
+indice = 1
+for(dato in ET){
+  if((dato > 2*puntajeAnotacionMaximo) & (dato <= 3*puntajeAnotacionMaximo)){
+    categorico[indice] = "BUENO"
+  }
+  else if((dato > puntajeAnotacionMaximo) & (dato <= 2*puntajeAnotacionMaximo)){
+    categorico[indice] = "MEDIO"
+  }
+  else{
+    categorico[indice] = "BAJO"
+  }
+  
+  indice = indice + 1
+}
+
+datos$VaCatEf = categorico
+
+datosSinCero = datos[datos$ET != 0,]
+
+write.csv(datosSinCero, file="baseDeDatosFinal.csv")
+```
