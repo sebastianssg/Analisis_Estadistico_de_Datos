@@ -45,12 +45,12 @@ donde tenemos que el mayor ET es 0.8333333, y el menor ET es 0, por lo que, la c
 "anotador bajo" si 0 < ET $\leq$ 0.27777767
 
 ```{r cars}
-datos = read.csv(file = "C:/Users/juluk/OneDrive - Universidad del rosario/Escritorio/Universidad 2021-2/AED/Proyecto final/v2/CollegeBasketballPlayers2009-2021v2.csv", sep=",")
+datos = read.csv(file = "CollegeBasketballPlayers2009-2021v2.csv", sep=",")
 
 ```
 
 
-```{r cars}
+```{r}
 ETPR = datos$TPM/datos$TPA
 ETwoPR = datos$twoPM/datos$twoPA
 
